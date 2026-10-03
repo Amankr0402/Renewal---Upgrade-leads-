@@ -36,6 +36,7 @@ import {
 export default function App() {
   // Authentication state
   const [currentUser, setCurrentUser] = useState(() => getCurrentUser());
+  const isAdmin = Boolean(currentUser?.role && currentUser.role.toLowerCase().includes('admin'));
 
   // Theme state
   const [theme, setTheme] = useState('dark');
@@ -292,6 +293,10 @@ export default function App() {
 
   // Download Report with guaranteed data fallback
   const handleExportReport = () => {
+    if (!isAdmin) {
+      showToast('Export CSV is restricted to Admin only.', 'warning');
+      return;
+    }
     if (activeTab === 'renewal') {
       const dataToExport = (renewals && renewals.length > 0) ? renewals : INITIAL_RENEWALS;
       exportRenewalsReport(dataToExport);
@@ -382,21 +387,23 @@ export default function App() {
           </button>
         </div>
 
-        {/* Status indicator on top right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-            Active View: <strong style={{ color: activeTab === 'renewal' ? '#6366f1' : '#10b981' }}>
-              {activeTab === 'renewal' ? 'Live Renewal Recovery Pipeline' : 'Metabase Upgrade Intelligence'}
-            </strong>
-          </span>
-          <button 
-            className="btn btn-sm btn-secondary"
-            onClick={handleExportReport}
-          >
-            <Download size={14} />
-            <span>Export CSV</span>
-          </button>
-        </div>
+        {/* Status indicator on top right - ONLY FOR ADMIN */}
+        {isAdmin && (
+          <div className="admin-status-bar" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              Active View: <strong style={{ color: activeTab === 'renewal' ? '#6366f1' : '#10b981' }}>
+                {activeTab === 'renewal' ? 'Live Renewal Recovery Pipeline' : 'Metabase Upgrade Intelligence'}
+              </strong>
+            </span>
+            <button 
+              className="btn btn-sm btn-secondary"
+              onClick={handleExportReport}
+            >
+              <Download size={14} />
+              <span>Export CSV</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Top Metric KPI Cards */}

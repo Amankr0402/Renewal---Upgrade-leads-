@@ -17,7 +17,8 @@ import {
   MapPin,
   ArrowUpRight,
   ChevronLeft,
-  Check
+  Check,
+  MessageSquare
 } from 'lucide-react';
 
 export default function RenewalView({ 
@@ -220,8 +221,8 @@ export default function RenewalView({
         </div>
       </div>
 
-      {/* Row-wise User Full Details Table with REAL Customer Name and Total Orders */}
-      <div className="table-container">
+      {/* Desktop Table View */}
+      <div className="table-container desktop-table-container">
         <table className="data-table">
           <thead>
             <tr>
@@ -274,14 +275,26 @@ export default function RenewalView({
                             <ArrowUpRight size={13} style={{ color: '#10b981' }} />
                           </div>
 
-                          {/* UR ID badge and Phone */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                          {/* UR ID badge and Phone with Direct Calling */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px', flexWrap: 'wrap' }}>
                             <span className="badge badge-indigo" style={{ padding: '1px 6px', fontSize: '0.68rem' }}>
                               {user.userNumber || user.id}
                             </span>
-                            <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
-                              {user.phone}
-                            </span>
+                            {user.phone ? (
+                              <a 
+                                href={`tel:${user.phone}`}
+                                className="phone-call-badge"
+                                title="Click to dial on phone"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <PhoneCall size={10} />
+                                <span>{user.phone}</span>
+                              </a>
+                            ) : (
+                              <span style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
+                                {user.phone}
+                              </span>
+                            )}
                           </div>
 
                           {/* Direct Admin Jump Link */}
@@ -512,6 +525,167 @@ export default function RenewalView({
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile-Optimized Caller Cards View (Dedicated for phone outreach) */}
+      <div className="mobile-leads-container">
+        {paginatedRenewals.length === 0 ? (
+          <div className="glass-panel" style={{ textAlign: 'center', padding: '36px 16px', color: 'var(--text-muted)' }}>
+            <Filter size={32} style={{ margin: '0 auto 10px', opacity: 0.4 }} />
+            <p style={{ fontWeight: 600, fontSize: '0.9rem' }}>No renewal subscribers match filter</p>
+            <p style={{ fontSize: '0.78rem' }}>Try clearing filters or search query.</p>
+          </div>
+        ) : (
+          paginatedRenewals.map((user, idx) => {
+            const isCalled = user.calledStatus && user.calledStatus.isCalled;
+            const latestNote = user.notes && user.notes.length > 0 ? user.notes[user.notes.length - 1] : null;
+
+            return (
+              <div 
+                key={`mob-${user.id}-${user.userNumber || idx}`} 
+                className={`mobile-lead-card glass-panel ${isCalled ? 'card-called' : ''}`}
+              >
+                {/* Header: Name, Avatar, Expiry & Orders */}
+                <div className="mobile-card-header">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div 
+                      className="avatar-badge" 
+                      style={{ background: getAvatarColor(user.name), width: '38px', height: '38px', fontSize: '0.85rem' }}
+                    >
+                      {(user.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                      <div 
+                        className="user-name-link"
+                        onClick={() => onSelectUser(user)}
+                        style={{ fontSize: '0.98rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <span>{user.name}</span>
+                        <ArrowUpRight size={13} style={{ color: '#10b981' }} />
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}>
+                        <span className="badge badge-indigo" style={{ fontSize: '0.66rem', padding: '1px 5px' }}>
+                          {user.userNumber || user.id}
+                        </span>
+                        <span style={{ fontSize: '0.74rem', color: 'var(--text-muted)' }}>
+                          {user.plan || 'Subscription'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ textAlign: 'right' }}>
+                    <span 
+                      className={`badge ${user.daysLeft <= 0 ? 'badge-rose' : 'badge-amber'}`}
+                      style={{ fontSize: '0.7rem' }}
+                    >
+                      {user.daysLeft <= 0 ? `Expired ${Math.abs(user.daysLeft)}d ago` : `${user.daysLeft}d left`}
+                    </span>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#10b981', marginTop: '3px' }}>
+                      ₹{(user.paidAmount || 1899).toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Primary Action Row: Direct Phone Call & Mark Called */}
+                <div className="mobile-card-actions">
+                  {user.phone ? (
+                    <a 
+                      href={`tel:${user.phone}`} 
+                      className="btn-mobile-call"
+                      title="Tap to dial phone directly"
+                    >
+                      <PhoneCall size={16} />
+                      <span>Call {user.phone}</span>
+                    </a>
+                  ) : (
+                    <button className="btn-mobile-call disabled" disabled>
+                      <PhoneCall size={16} />
+                      <span>No Phone</span>
+                    </button>
+                  )}
+
+                  {isCalled ? (
+                    <button 
+                      className="btn-mobile-called active"
+                      onClick={() => onToggleCall && onToggleCall(user)}
+                      title="Click to toggle status"
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Check size={14} />
+                        <span>Called ✓</span>
+                      </div>
+                      <span className="mobile-called-author">By {user.calledStatus.calledBy || 'Sales'}</span>
+                    </button>
+                  ) : (
+                    <button 
+                      className="btn-mobile-called"
+                      onClick={() => onToggleCall && onToggleCall(user)}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <PhoneCall size={14} />
+                        <span>Mark Called</span>
+                      </div>
+                    </button>
+                  )}
+                </div>
+
+                {/* Secondary Meta: Expiry Date, City & TeleCRM */}
+                <div className="mobile-card-meta">
+                  <div className="meta-item">
+                    <span className="meta-label">Expiry</span>
+                    <span className="meta-val">{user.expireDate || 'N/A'}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">Orders</span>
+                    <span className="meta-val">{user.totalOrders || 0}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">City</span>
+                    <span className="meta-val">{user.libraryCity || user.company || 'Delhi'}</span>
+                  </div>
+                  <div className="meta-item">
+                    <span className="meta-label">TeleCRM</span>
+                    <span className="meta-val">{user.telecrmDetails?.lastAssignee || 'Unassigned'}</span>
+                  </div>
+                </div>
+
+                {/* Notes Drawer Link & Latest Note Preview */}
+                <div className="mobile-card-footer">
+                  <button 
+                    className="btn btn-sm btn-outline mobile-notes-btn"
+                    onClick={() => onSelectUser(user)}
+                    style={{ flex: 1, justifyContent: 'center' }}
+                  >
+                    <MessageSquare size={13} style={{ color: '#818cf8' }} />
+                    <span>Notes ({user.notes?.length || 0})</span>
+                  </button>
+
+                  <a 
+                    href={user.adminUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn btn-sm btn-admin"
+                    style={{ padding: '6px 12px', fontSize: '0.74rem' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (onAdminJump) onAdminJump(user);
+                    }}
+                  >
+                    <ShieldCheck size={13} />
+                    <span>Admin</span>
+                  </a>
+                </div>
+
+                {latestNote && (
+                  <div className="mobile-latest-note">
+                    <span style={{ fontWeight: 700, color: 'var(--text-secondary)' }}>Note ({latestNote.author || 'Agent'}):</span> {latestNote.text}
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
       </div>
 
       {/* Pagination Bar */}

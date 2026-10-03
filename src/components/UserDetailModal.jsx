@@ -157,6 +157,19 @@ export default function UserDetailModal({
             </div>
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {/* Direct Phone Call Button */}
+              {user.phone && (
+                <a 
+                  href={`tel:${user.phone}`} 
+                  className="btn btn-success"
+                  title="Click to dial customer immediately"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <PhoneCall size={16} />
+                  <span>Call {user.phone}</span>
+                </a>
+              )}
+
               {/* Admin Portal Direct Jump Button */}
               <a 
                 href={user.adminUrl} 

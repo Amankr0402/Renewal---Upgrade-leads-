@@ -153,11 +153,13 @@ export default function TeamCredentialsModal({ isOpen, onClose, currentUser, onC
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >
+                  <option value="Caller">Caller (Calling Portal)</option>
+                  <option value="Sales Caller">Sales Caller</option>
                   <option value="Sales Executive">Sales Executive</option>
                   <option value="Sales Lead">Sales Lead</option>
                   <option value="TeleCRM Agent">TeleCRM Agent</option>
                   <option value="CRM Manager">CRM Manager</option>
-                  <option value="Super Admin">Super Admin</option>
+                  <option value="Super Admin">Super Admin (Full Access)</option>
                 </select>
               </div>
             </div>
