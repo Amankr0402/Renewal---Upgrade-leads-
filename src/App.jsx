@@ -7,6 +7,7 @@ import UserDetailModal from './components/UserDetailModal';
 import MetabaseModal from './components/MetabaseModal';
 import GoogleSheetModal from './components/GoogleSheetModal';
 import TeamCredentialsModal from './components/TeamCredentialsModal';
+import DatabaseViewerModal from './components/DatabaseViewerModal';
 import LoginView from './components/LoginView';
 import { getCurrentUser, logoutUser } from './data/authService';
 import { 
@@ -59,6 +60,7 @@ export default function App() {
   const [showMetabaseModal, setShowMetabaseModal] = useState(false);
   const [showGoogleSheetModal, setShowGoogleSheetModal] = useState(false);
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
+  const [showDbModal, setShowDbModal] = useState(false);
 
   // Toast notifications
   const [toasts, setToasts] = useState([]);
@@ -283,6 +285,7 @@ export default function App() {
         onOpenMetabase={() => setShowMetabaseModal(true)}
         onOpenGoogleSheet={() => setShowGoogleSheetModal(true)}
         onOpenCredentials={() => setShowCredentialsModal(true)}
+        onOpenDatabase={() => setShowDbModal(true)}
         currentUser={currentUser}
         onLogout={() => {
           logoutUser();
@@ -419,6 +422,12 @@ export default function App() {
         onCredentialsChange={(updated) => {
           showToast(`Team credentials updated (${updated.length} active users)`);
         }}
+      />
+
+      {/* Database Notes & Storage Engine Verification Modal */}
+      <DatabaseViewerModal 
+        isOpen={showDbModal}
+        onClose={() => setShowDbModal(false)}
       />
 
       {/* Metabase Link & Query Integration Modal */}

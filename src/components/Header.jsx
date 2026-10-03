@@ -21,6 +21,7 @@ export default function Header({
   onOpenMetabase, 
   onOpenGoogleSheet,
   onOpenCredentials,
+  onOpenDatabase,
   currentUser,
   onLogout,
   onExportReport,
@@ -111,6 +112,17 @@ export default function Header({
           <span>Admin Portal</span>
           <ExternalLink size={13} />
         </a>
+
+        {/* Database Verification */}
+        <button 
+          className="btn btn-outline"
+          onClick={onOpenDatabase}
+          title="Verify Notes Database & Storage Engine"
+          style={{ padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+        >
+          <Database size={16} />
+          <span>DB Notes</span>
+        </button>
 
         {/* Manage Team Credentials */}
         <button 
