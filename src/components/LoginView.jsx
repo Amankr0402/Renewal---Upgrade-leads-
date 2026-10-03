@@ -43,18 +43,6 @@ export default function LoginView({ onLoginSuccess }) {
     }, 400);
   };
 
-  // Helper for 1-click test login
-  const handleQuickLogin = (demoEmail, demoPassword) => {
-    setEmail(demoEmail);
-    setPassword(demoPassword);
-    const result = loginUser(demoEmail, demoPassword);
-    if (result.success) {
-      onLoginSuccess(result.user);
-    }
-  };
-
-  const authorizedList = getStoredCredentials();
-
   return (
     <div style={{
       minHeight: '100vh',
@@ -205,47 +193,6 @@ export default function LoginView({ onLoginSuccess }) {
             <ArrowRight size={16} />
           </button>
         </form>
-
-        {/* Quick Demo Credentials for Fast Testing */}
-        <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <span style={{ fontSize: '0.74rem', color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Quick 1-Click Authorized Logins
-            </span>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <button 
-              type="button"
-              className="btn btn-outline" 
-              style={{ justifyContent: 'space-between', padding: '6px 10px', fontSize: '0.76rem', borderColor: 'rgba(255,255,255,0.08)' }}
-              onClick={() => handleQuickLogin('admin@theelefant.ai', 'Admin@2026!')}
-            >
-              <span style={{ fontWeight: 600 }}>👑 Operations Admin</span>
-              <span style={{ color: '#94a3b8' }}>admin@theelefant.ai</span>
-            </button>
-            <button 
-              type="button"
-              className="btn btn-outline" 
-              style={{ justifyContent: 'space-between', padding: '6px 10px', fontSize: '0.76rem', borderColor: 'rgba(255,255,255,0.08)' }}
-              onClick={() => handleQuickLogin('sales@theelefant.ai', 'Sales@2026!')}
-            >
-              <span style={{ fontWeight: 600 }}>💼 Sales Team Lead</span>
-              <span style={{ color: '#94a3b8' }}>sales@theelefant.ai</span>
-            </button>
-            <button 
-              type="button"
-              className="btn btn-outline" 
-              style={{ justifyContent: 'space-between', padding: '6px 10px', fontSize: '0.76rem', borderColor: 'rgba(255,255,255,0.08)' }}
-              onClick={() => handleQuickLogin('telecrm@theelefant.ai', 'Crm@2026!')}
-            >
-              <span style={{ fontWeight: 600 }}>📞 TeleCRM Supervisor</span>
-              <span style={{ color: '#94a3b8' }}>telecrm@theelefant.ai</span>
-            </button>
-          </div>
-          <p style={{ margin: '12px 0 0', fontSize: '0.7rem', color: '#64748b', textAlign: 'center' }}>
-            New credentials can be added and managed by the Admin inside settings anytime.
-          </p>
-        </div>
       </div>
     </div>
   );

@@ -234,7 +234,7 @@ export default function TeamCredentialsModal({ isOpen, onClose, currentUser, onC
                         </span>
                       </div>
                       <span style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
-                        {c.email} &bull; Password: <code>{c.password}</code>
+                        {c.email} &bull; Password: <code>••••••••</code>
                       </span>
                     </div>
                   </div>

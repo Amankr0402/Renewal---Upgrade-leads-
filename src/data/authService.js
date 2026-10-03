@@ -1,61 +1,33 @@
 // Authentication and Credentials Management for Renewal & Upgrade Intelligence Portal
 
-const CREDENTIALS_KEY = "ag_portal_credentials_v1";
-const SESSION_KEY = "ag_portal_session_v1";
+const CREDENTIALS_KEY = "ag_portal_credentials_v2";
+const SESSION_KEY = "ag_portal_session_v2";
 
-// Pre-configured team credentials
+// Authorized team credentials
 const DEFAULT_CREDENTIALS = [
   {
-    id: "usr-admin-1",
-    name: "Operations Admin",
-    email: "admin@theelefant.ai",
-    password: "Admin@2026!",
+    id: "usr-aman",
+    name: "Aman Soni",
+    email: "aman.soni@theelefant.ai",
+    password: "aman@1234",
     role: "Super Admin",
     team: "Management"
-  },
-  {
-    id: "usr-sales-lead",
-    name: "Sales Team Lead",
-    email: "sales@theelefant.ai",
-    password: "Sales@2026!",
-    role: "Sales Lead",
-    team: "Sales"
-  },
-  {
-    id: "usr-crm-lead",
-    name: "TeleCRM Supervisor",
-    email: "telecrm@theelefant.ai",
-    password: "Crm@2026!",
-    role: "CRM Manager",
-    team: "TeleCRM"
-  },
-  {
-    id: "usr-rahul",
-    name: "Rahul Sharma",
-    email: "rahul@theelefant.ai",
-    password: "Rahul@2026!",
-    role: "Sales Executive",
-    team: "Renewal Sales"
-  },
-  {
-    id: "usr-sneha",
-    name: "Sneha Rao",
-    email: "sneha@theelefant.ai",
-    password: "Sneha@2026!",
-    role: "Sales Executive",
-    team: "Renewal Sales"
   }
 ];
 
 export function getStoredCredentials() {
   try {
+    // Purge old test session and credentials
+    localStorage.removeItem("ag_portal_credentials_v1");
+    localStorage.removeItem("ag_portal_session_v1");
+
     const raw = localStorage.getItem(CREDENTIALS_KEY);
     if (!raw) {
       localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(DEFAULT_CREDENTIALS));
       return DEFAULT_CREDENTIALS;
     }
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
+    if (!Array.isArray(parsed) || parsed.length === 0 || parsed.some(c => c.email === 'admin@theelefant.ai')) {
       localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(DEFAULT_CREDENTIALS));
       return DEFAULT_CREDENTIALS;
     }
