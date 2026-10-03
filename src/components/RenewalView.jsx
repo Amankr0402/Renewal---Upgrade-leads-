@@ -16,7 +16,8 @@ import {
   Tag,
   MapPin,
   ArrowUpRight,
-  ChevronLeft
+  ChevronLeft,
+  Check
 } from 'lucide-react';
 
 export default function RenewalView({ 
@@ -25,7 +26,9 @@ export default function RenewalView({
   setSelectedFilter, 
   onSelectUser, 
   onQuickAddNote,
-  onAdminJump 
+  onAdminJump,
+  currentUser,
+  onToggleCall
 }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFrom, setDateFrom] = useState('');
@@ -36,6 +39,10 @@ export default function RenewalView({
   // Filter logic across all renewal records
   const filteredRenewals = useMemo(() => {
     return renewals.filter(user => {
+      // Called status filter
+      if (selectedFilter === 'called' && (!user.calledStatus || !user.calledStatus.isCalled)) return false;
+      if (selectedFilter === 'not_called' && user.calledStatus && user.calledStatus.isCalled) return false;
+
       // Month / Urgency filter
       if (selectedFilter === 'oct_hot' && !user.expireDate?.startsWith('2026-10')) return false;
       if (selectedFilter === 'sep_expired' && !user.expireDate?.startsWith('2026-09')) return false;
@@ -56,7 +63,8 @@ export default function RenewalView({
         const matchesCompany = user.company?.toLowerCase().includes(query);
         const matchesPlan = user.plan?.toLowerCase().includes(query);
         const matchesAssignee = user.telecrmDetails?.lastAssignee?.toLowerCase().includes(query);
-        if (!matchesName && !matchesUserNum && !matchesPhone && !matchesCompany && !matchesPlan && !matchesAssignee) {
+        const matchesCaller = user.calledStatus?.calledBy?.toLowerCase().includes(query);
+        if (!matchesName && !matchesUserNum && !matchesPhone && !matchesCompany && !matchesPlan && !matchesAssignee && !matchesCaller) {
           return false;
         }
       }
@@ -111,11 +119,13 @@ export default function RenewalView({
     return <span className="badge badge-cyan">{expireDate || 'Expired'}</span>;
   };
 
-  // Month counts for quick pills
+  // Month & Call counts for quick pills
   const octCount = useMemo(() => renewals.filter(r => r.expireDate?.startsWith('2026-10')).length, [renewals]);
   const sepCount = useMemo(() => renewals.filter(r => r.expireDate?.startsWith('2026-09')).length, [renewals]);
   const augCount = useMemo(() => renewals.filter(r => r.expireDate?.startsWith('2026-08')).length, [renewals]);
   const julCount = useMemo(() => renewals.filter(r => r.expireDate?.startsWith('2026-07')).length, [renewals]);
+  const calledCount = useMemo(() => renewals.filter(r => r.calledStatus && r.calledStatus.isCalled).length, [renewals]);
+  const notCalledCount = useMemo(() => renewals.filter(r => !r.calledStatus || !r.calledStatus.isCalled).length, [renewals]);
 
   return (
     <div className="renewal-view-container">
@@ -140,6 +150,20 @@ export default function RenewalView({
             onClick={() => setSelectedFilter('all')}
           >
             All Renewals ({renewals.length.toLocaleString('en-IN')})
+          </button>
+          <button 
+            className={`filter-pill ${selectedFilter === 'called' ? 'active' : ''}`}
+            onClick={() => setSelectedFilter('called')}
+          >
+            <Check size={13} style={{ color: '#34d399' }} />
+            <span>Called ({calledCount})</span>
+          </button>
+          <button 
+            className={`filter-pill ${selectedFilter === 'not_called' ? 'active' : ''}`}
+            onClick={() => setSelectedFilter('not_called')}
+          >
+            <PhoneCall size={13} style={{ color: '#fbbf24' }} />
+            <span>Pending Calls ({notCalledCount})</span>
           </button>
           <button 
             className={`filter-pill ${selectedFilter === 'oct_hot' ? 'active' : ''}`}
@@ -215,13 +239,14 @@ export default function RenewalView({
               <th>Location & Coupon</th>
               <th>TeleCRM Assignee</th>
               <th>Manual Notes</th>
+              <th>Called Status</th>
               <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {paginatedRenewals.length === 0 ? (
               <tr>
-                <td colSpan="8" style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text-muted)' }}>
+                <td colSpan="9" style={{ textAlign: 'center', padding: '48px 20px', color: 'var(--text-muted)' }}>
                   <Filter size={36} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
                   <p style={{ fontWeight: 600, fontSize: '0.95rem' }}>No renewal subscribers match the current filter</p>
                   <p style={{ fontSize: '0.8rem' }}>Try clearing your search query or selecting 'All Renewals'.</p>
@@ -426,6 +451,56 @@ export default function RenewalView({
                           </span>
                         )}
                       </div>
+                    </td>
+
+                    {/* Called Status Column */}
+                    <td>
+                      {user.calledStatus && user.calledStatus.isCalled ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                          <button
+                            className="btn btn-sm"
+                            style={{
+                              background: 'rgba(16, 185, 129, 0.15)',
+                              color: '#34d399',
+                              border: '1px solid rgba(16, 185, 129, 0.4)',
+                              padding: '2px 8px',
+                              fontSize: '0.74rem',
+                              fontWeight: 700,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '5px',
+                              width: 'fit-content'
+                            }}
+                            onClick={() => onToggleCall && onToggleCall(user)}
+                            title={`Marked as called by ${user.calledStatus.calledBy}. Click to update or toggle.`}
+                          >
+                            <Check size={12} />
+                            <span>Called ✓</span>
+                          </button>
+                          <div style={{ fontSize: '0.72rem', color: 'var(--text-primary)', fontWeight: 700 }}>
+                            By: {user.calledStatus.calledBy || 'Sales Agent'}
+                          </div>
+                          <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>
+                            {user.calledStatus.calledAt}
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          className="btn btn-sm btn-outline"
+                          style={{
+                            padding: '3px 8px',
+                            fontSize: '0.74rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px'
+                          }}
+                          onClick={() => onToggleCall && onToggleCall(user)}
+                          title={`Click to mark as called by ${currentUser?.name || 'Aman Soni'}`}
+                        >
+                          <PhoneCall size={12} style={{ color: '#818cf8' }} />
+                          <span>Mark Called</span>
+                        </button>
+                      )}
                     </td>
 
                     {/* Action Buttons */}

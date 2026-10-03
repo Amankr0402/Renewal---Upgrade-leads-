@@ -10,6 +10,7 @@ export const INITIAL_RENEWALS = METABASE_RENEWALS_LIVE;
 const STORAGE_KEYS = {
   RENEWALS_NOTES: "metabase_renewals_notes_v9",
   UPGRADES_NOTES: "metabase_upgrades_notes_v9",
+  CALLED_STATUS: "metabase_called_status_v1",
   UPGRADES: "metabase_upgrades_v9",
   METABASE_CONFIG: "metabase_config_v9"
 };
@@ -18,16 +19,19 @@ export function getStoredRenewals() {
   try {
     const rawNotes = localStorage.getItem(STORAGE_KEYS.RENEWALS_NOTES);
     const notesMap = rawNotes ? JSON.parse(rawNotes) : {};
+
+    const rawCalled = localStorage.getItem(STORAGE_KEYS.CALLED_STATUS);
+    const calledMap = rawCalled ? JSON.parse(rawCalled) : {};
     
-    // Attach notes to initial renewals
+    // Attach notes and called status to initial renewals
     return INITIAL_RENEWALS.map(user => {
-      if (notesMap[user.id] || (user.userId && notesMap[user.userId])) {
-        return {
-          ...user,
-          notes: notesMap[user.id] || notesMap[user.userId] || []
-        };
-      }
-      return user;
+      const userNotes = notesMap[user.id] || (user.userId && notesMap[user.userId]) || user.notes || [];
+      const userCalled = calledMap[user.id] || (user.userId && calledMap[user.userId]) || null;
+      return {
+        ...user,
+        notes: userNotes,
+        calledStatus: userCalled
+      };
     });
   } catch (e) {
     return INITIAL_RENEWALS;
@@ -46,6 +50,21 @@ export function saveStoredRenewals(data) {
       });
     }
     localStorage.setItem(STORAGE_KEYS.RENEWALS_NOTES, JSON.stringify(notesMap));
+  } catch (e) {}
+}
+
+export function saveStoredCalledStatus(data) {
+  try {
+    const calledMap = {};
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        if (item.calledStatus && item.calledStatus.isCalled) {
+          calledMap[item.id] = item.calledStatus;
+          if (item.userId) calledMap[item.userId] = item.calledStatus;
+        }
+      });
+    }
+    localStorage.setItem(STORAGE_KEYS.CALLED_STATUS, JSON.stringify(calledMap));
   } catch (e) {}
 }
 
@@ -102,9 +121,12 @@ export function parseMetabaseRenewalsCSV(csvText) {
   const renewals = [];
 
   let notesMap = {};
+  let calledMap = {};
   try {
     const rawNotes = localStorage.getItem(STORAGE_KEYS.RENEWALS_NOTES);
     if (rawNotes) notesMap = JSON.parse(rawNotes);
+    const rawCalled = localStorage.getItem(STORAGE_KEYS.CALLED_STATUS);
+    if (rawCalled) calledMap = JSON.parse(rawCalled);
   } catch (e) {}
 
   for (let i = 1; i < lines.length; i++) {
@@ -148,6 +170,7 @@ export function parseMetabaseRenewalsCSV(csvText) {
     const orders = parseInt(total_orders) || 0;
     const agent = agents[i % agents.length];
     const userNotes = notesMap[user_id] || (user_number && notesMap[user_number]) || [];
+    const userCalled = calledMap[user_id] || (user_number && calledMap[user_number]) || null;
 
     renewals.push({
       id: user_id || (`REN-${i}`),
@@ -181,7 +204,8 @@ export function parseMetabaseRenewalsCSV(csvText) {
         totalCalls: 1 + (i % 4),
         nextAction: 'Offer renewal revival discount via WhatsApp TeleCRM'
       },
-      notes: userNotes
+      notes: userNotes,
+      calledStatus: userCalled
     });
   }
 

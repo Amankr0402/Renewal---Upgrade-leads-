@@ -13,6 +13,7 @@ import { getCurrentUser, logoutUser } from './data/authService';
 import { 
   getStoredRenewals, 
   saveStoredRenewals, 
+  saveStoredCalledStatus,
   getStoredUpgrades, 
   saveStoredUpgrades,
   getMetabaseConfig,
@@ -238,6 +239,57 @@ export default function App() {
     }
   };
 
+  // Toggle call status by sales team
+  const handleToggleCall = (targetUser) => {
+    const isCurrentlyCalled = targetUser.calledStatus && targetUser.calledStatus.isCalled;
+    const nowTime = new Date().toLocaleString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    const newCalledStatus = isCurrentlyCalled
+      ? null
+      : {
+          isCalled: true,
+          calledBy: currentUser?.name || 'Aman Soni',
+          calledByEmail: currentUser?.email || 'aman.soni@theelefant.ai',
+          calledByRole: currentUser?.role || 'Super Admin',
+          calledAt: nowTime
+        };
+
+    const updated = renewals.map(u => {
+      if (u.id === targetUser.id || (u.userId && u.userId === targetUser.userId)) {
+        return {
+          ...u,
+          calledStatus: newCalledStatus
+        };
+      }
+      return u;
+    });
+
+    setRenewals(updated);
+    saveStoredCalledStatus(updated);
+
+    if (newCalledStatus) {
+      showToast(`Marked ${targetUser.name} as Called by ${newCalledStatus.calledBy}`);
+      // Save an automated system note
+      const callLogNote = {
+        id: `call-${Date.now()}`,
+        author: newCalledStatus.calledBy,
+        authorEmail: newCalledStatus.calledByEmail,
+        authorRole: newCalledStatus.calledByRole,
+        text: `Call completed by ${newCalledStatus.calledBy}. Lead marked as contacted.`,
+        timestamp: nowTime,
+        tag: 'Call Log'
+      };
+      saveRemoteNote(targetUser.id, callLogNote);
+    } else {
+      showToast(`Unmarked call status for ${targetUser.name}`);
+    }
+  };
+
   // Download Report with guaranteed data fallback
   const handleExportReport = () => {
     if (activeTab === 'renewal') {
@@ -374,6 +426,8 @@ export default function App() {
             setModalType('renewal');
           }}
           onAdminJump={handleAdminJump}
+          currentUser={currentUser}
+          onToggleCall={handleToggleCall}
         />
       ) : (
         <UpgradeView 

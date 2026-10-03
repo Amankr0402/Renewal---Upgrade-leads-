@@ -20,38 +20,15 @@ export default function MetricCards({
   onFilterChange 
 }) {
   if (activeTab === 'renewal') {
-    const totalRenewals = renewals.length;
     // Categorize renewal subscribers
     const hotLeads = renewals.filter(r => Math.abs(r.daysLeft) <= 7);
     const sepExpired = renewals.filter(r => r.expireDate && r.expireDate.startsWith('2026-09'));
     const totalRenewalOrders = renewals.reduce((acc, curr) => acc + (curr.totalOrders || 0), 0);
-    const totalPipelineValue = renewals.reduce((acc, curr) => acc + (curr.planPrice || 0), 0);
+    const calledLeads = renewals.filter(r => r.calledStatus && r.calledStatus.isCalled);
 
     return (
       <div className="stats-grid">
-        {/* Card 1: Total Number of Renewal Subscribers */}
-        <div 
-          className="glass-panel stat-card indigo"
-          onClick={() => onFilterChange && onFilterChange('all')}
-          style={{ cursor: 'pointer' }}
-          title="Total Number of Renewal Subscribers from Metabase"
-        >
-          <div className="stat-header">
-            <span className="stat-title">Total Number (Renewals)</span>
-            <div className="stat-icon-wrap" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}>
-              <Users size={20} />
-            </div>
-          </div>
-          <div className="stat-val-row">
-            <span className="stat-val" style={{ color: '#818cf8' }}>{totalRenewals.toLocaleString('en-IN')}</span>
-            <span className="badge badge-indigo">Renewal Pool</span>
-          </div>
-          <p className="stat-subtext">
-            <span>Metabase Expired Subscribers</span>
-          </p>
-        </div>
-
-        {/* Card 2: Hot Leads (0-7 Days Window) */}
+        {/* Card 1: Hot Leads (0-7 Days Window) */}
         <div 
           className="glass-panel stat-card urgent"
           onClick={() => onFilterChange && onFilterChange('recent_expired')}
@@ -72,7 +49,7 @@ export default function MetricCards({
           </p>
         </div>
 
-        {/* Card 3: September Expired (Last Month) */}
+        {/* Card 2: September Expired (Last Month) */}
         <div 
           className="glass-panel stat-card warning"
           onClick={() => onFilterChange && onFilterChange('sep_expired')}
@@ -93,7 +70,7 @@ export default function MetricCards({
           </p>
         </div>
 
-        {/* Card 4: Total Orders (Renewals) */}
+        {/* Card 3: Total Orders (Renewals) */}
         <div 
           className="glass-panel stat-card success"
           onClick={() => onFilterChange && onFilterChange('orders')}
@@ -114,20 +91,24 @@ export default function MetricCards({
           </p>
         </div>
 
-        {/* Card 5: Total Renewal Recovery Value */}
-        <div className="glass-panel stat-card indigo">
+        {/* Card 4: Sales Calls Marked */}
+        <div 
+          className="glass-panel stat-card indigo"
+          onClick={() => onFilterChange && onFilterChange('called')}
+          style={{ cursor: 'pointer' }}
+        >
           <div className="stat-header">
-            <span className="stat-title">Total Renewal Value</span>
+            <span className="stat-title">Sales Calls Marked</span>
             <div className="stat-icon-wrap" style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#818cf8' }}>
-              <CreditCard size={20} />
+              <Users size={20} />
             </div>
           </div>
           <div className="stat-val-row">
-            <span className="stat-val">₹{totalPipelineValue.toLocaleString('en-IN')}</span>
-            <span className="badge badge-indigo">Target Recovery</span>
+            <span className="stat-val" style={{ color: '#818cf8' }}>{calledLeads.length}</span>
+            <span className="badge badge-indigo">Outreach Done</span>
           </div>
           <p className="stat-subtext">
-            <span>Avg: ₹{Math.round(totalPipelineValue / (totalRenewals || 1)).toLocaleString('en-IN')} / subscriber</span>
+            <span>Subscribers called by sales team</span>
           </p>
         </div>
       </div>
