@@ -414,49 +414,23 @@ export default function RenewalView({
                       </div>
                     </td>
 
-                    {/* Manual Notes Section */}
-                    <td>
-                      <div style={{ maxWidth: '200px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    {/* Manual Notes Column: Clean Msg Logo with Red Indicator */}
+                    <td style={{ textAlign: 'center' }}>
+                      <button 
+                        className={`notes-msg-btn ${user.notes && user.notes.length > 0 ? 'has-notes' : 'empty-notes'}`}
+                        onClick={() => onSelectUser(user)}
+                        title={user.notes && user.notes.length > 0 
+                          ? `${user.notes.length} Note${user.notes.length > 1 ? 's' : ''} logged. Click to view notes.`
+                          : 'No notes logged yet. Click to write a manual note.'}
+                      >
+                        <MessageSquare size={19} />
+                        {user.notes && user.notes.length > 0 && (
                           <span 
-                            className="notes-indicator"
-                            onClick={() => onSelectUser(user)}
-                            title="Click to view all notes"
-                          >
-                            <FileText size={12} />
-                            <span>{user.notes ? user.notes.length : 0} Notes</span>
-                          </span>
-                          <button 
-                            className="btn-icon"
-                            style={{ width: '22px', height: '22px' }}
-                            onClick={() => onQuickAddNote(user)}
-                            title="Add note manually for this subscriber"
-                          >
-                            <Plus size={13} />
-                          </button>
-                        </div>
-                        {latestNote ? (
-                          <div 
-                            style={{ 
-                              fontSize: '0.72rem', 
-                              color: 'var(--text-secondary)',
-                              background: 'var(--bg-input)',
-                              padding: '4px 6px',
-                              borderRadius: '4px',
-                              borderLeft: '2px solid var(--accent-primary)',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            <strong>{latestNote.author.split(' ')[0]}:</strong> {latestNote.text}
-                          </div>
-                        ) : (
-                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                            No notes logged
-                          </span>
+                            className="notes-red-dot" 
+                            title={`${user.notes.length} Note${user.notes.length > 1 ? 's' : ''}`}
+                          />
                         )}
-                      </div>
+                      </button>
                     </td>
 
                     {/* Calling & Phone Dialer Column */}

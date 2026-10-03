@@ -671,6 +671,60 @@ body {
   color: var(--text-primary);
 }
 
+/* Minimal Message Logo & Red Mark for Notes */
+.notes-msg-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+}
+
+.notes-msg-btn:hover {
+  background: rgba(99, 102, 241, 0.12);
+  border-color: #6366f1;
+  color: #818cf8;
+  transform: translateY(-1px);
+}
+
+.notes-msg-btn.has-notes {
+  color: #818cf8;
+  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+.notes-red-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 9px;
+  height: 9px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid var(--bg-card-solid, #131b2e);
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.85);
+  animation: pulseRedDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseRedDot {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.8);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 1);
+  }
+}
+
 /* Action Icons Group in Table */
 .action-btn-group {
   display: flex;

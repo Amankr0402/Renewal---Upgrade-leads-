@@ -15,7 +15,8 @@ import {
   MapPin,
   PhoneCall,
   Package,
-  ShoppingBag
+  ShoppingBag,
+  MessageSquare
 } from 'lucide-react';
 
 export default function UpgradeView({ 
@@ -455,25 +456,23 @@ export default function UpgradeView({
                       </div>
                     </td>
 
-                    {/* Notes Section */}
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span 
-                          className="notes-indicator"
-                          onClick={() => onSelectUpgrade(item)}
-                        >
-                          <FileText size={12} />
-                          <span>{item.notes ? item.notes.length : 0} Notes</span>
-                        </span>
-                        <button 
-                          className="btn-icon"
-                          style={{ width: '22px', height: '22px' }}
-                          onClick={() => onQuickAddNote(item)}
-                          title="Add note for this upgrade"
-                        >
-                          <Plus size={13} />
-                        </button>
-                      </div>
+                    {/* Notes Section: Clean Msg Logo with Red Indicator */}
+                    <td style={{ textAlign: 'center' }}>
+                      <button 
+                        className={`notes-msg-btn ${item.notes && item.notes.length > 0 ? 'has-notes' : 'empty-notes'}`}
+                        onClick={() => onSelectUpgrade(item)}
+                        title={item.notes && item.notes.length > 0 
+                          ? `${item.notes.length} Note${item.notes.length > 1 ? 's' : ''} logged. Click to view notes.`
+                          : 'No notes logged yet. Click to write a manual note.'}
+                      >
+                        <MessageSquare size={19} />
+                        {item.notes && item.notes.length > 0 && (
+                          <span 
+                            className="notes-red-dot" 
+                            title={`${item.notes.length} Note${item.notes.length > 1 ? 's' : ''}`}
+                          />
+                        )}
+                      </button>
                     </td>
 
                     {/* Action */}
