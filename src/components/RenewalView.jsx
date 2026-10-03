@@ -48,7 +48,6 @@ export default function RenewalView({
       if (selectedFilter === 'sep_expired' && !user.expireDate?.startsWith('2026-09')) return false;
       if (selectedFilter === 'aug_expired' && !user.expireDate?.startsWith('2026-08')) return false;
       if (selectedFilter === 'jul_expired' && !user.expireDate?.startsWith('2026-07')) return false;
-      if (selectedFilter === '2026_ytd' && !user.expireDate?.startsWith('2026')) return false;
 
       // Expiry Date Range Filter
       if (dateFrom && user.expireDate < dateFrom) return false;
@@ -189,12 +188,6 @@ export default function RenewalView({
             onClick={() => setSelectedFilter('jul_expired')}
           >
             Jul Expired ({julCount})
-          </button>
-          <button 
-            className={`filter-pill ${selectedFilter === '2026_ytd' ? 'active' : ''}`}
-            onClick={() => setSelectedFilter('2026_ytd')}
-          >
-            2026 YTD
           </button>
         </div>
 

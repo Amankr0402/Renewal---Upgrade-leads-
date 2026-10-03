@@ -1,5 +1,15 @@
 [
   {
+    "id": "call-1791033251786",
+    "subscriberId": "a5c98455-07ff-490f-b286-1600eaa8c166",
+    "text": "Call completed by Aman Soni. Lead marked as contacted.",
+    "author": "Aman Soni",
+    "authorEmail": "aman.soni@theelefant.ai",
+    "authorRole": "Super Admin",
+    "tag": "Call Log",
+    "timestamp": "03 Oct, 06:44 pm"
+  },
+  {
     "subscriberId": "UR329520",
     "text": "Spoke with customer regarding annual renewal discount",
     "author": "Aman Soni",

@@ -23,7 +23,6 @@ export default function MetricCards({
     // Categorize renewal subscribers
     const hotLeads = renewals.filter(r => Math.abs(r.daysLeft) <= 7);
     const sepExpired = renewals.filter(r => r.expireDate && r.expireDate.startsWith('2026-09'));
-    const totalRenewalOrders = renewals.reduce((acc, curr) => acc + (curr.totalOrders || 0), 0);
     const calledLeads = renewals.filter(r => r.calledStatus && r.calledStatus.isCalled);
 
     return (
@@ -70,28 +69,7 @@ export default function MetricCards({
           </p>
         </div>
 
-        {/* Card 3: Total Orders (Renewals) */}
-        <div 
-          className="glass-panel stat-card success"
-          onClick={() => onFilterChange && onFilterChange('orders')}
-          style={{ cursor: 'pointer' }}
-        >
-          <div className="stat-header">
-            <span className="stat-title">Total Orders (Renewals)</span>
-            <div className="stat-icon-wrap" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#34d399' }}>
-              <Package size={20} />
-            </div>
-          </div>
-          <div className="stat-val-row">
-            <span className="stat-val" style={{ color: '#34d399' }}>{totalRenewalOrders.toLocaleString('en-IN')}</span>
-            <span className="badge badge-emerald">Orders Count</span>
-          </div>
-          <p className="stat-subtext">
-            <span>Lifetime orders across renewal base</span>
-          </p>
-        </div>
-
-        {/* Card 4: Sales Calls Marked */}
+        {/* Card 3: Sales Calls Marked */}
         <div 
           className="glass-panel stat-card indigo"
           onClick={() => onFilterChange && onFilterChange('called')}
@@ -109,6 +87,27 @@ export default function MetricCards({
           </div>
           <p className="stat-subtext">
             <span>Subscribers called by sales team</span>
+          </p>
+        </div>
+
+        {/* Card 4: Pending Outreach Calls */}
+        <div 
+          className="glass-panel stat-card"
+          onClick={() => onFilterChange && onFilterChange('not_called')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className="stat-header">
+            <span className="stat-title">Pending Outreach Calls</span>
+            <div className="stat-icon-wrap" style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#f87171' }}>
+              <AlertCircle size={20} />
+            </div>
+          </div>
+          <div className="stat-val-row">
+            <span className="stat-val" style={{ color: '#f87171' }}>{renewals.length - calledLeads.length}</span>
+            <span className="badge badge-rose">Pending Action</span>
+          </div>
+          <p className="stat-subtext">
+            <span>Awaiting sales team outreach</span>
           </p>
         </div>
       </div>
