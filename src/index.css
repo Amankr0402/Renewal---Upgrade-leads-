@@ -74,6 +74,23 @@
   padding: 0;
 }
 
+html, body {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust: 100%;
+}
+
+#root {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-primary);
@@ -109,9 +126,11 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
   max-width: 1680px;
   margin: 0 auto;
-  padding: 20px 28px 48px;
+  padding: 20px 24px 48px;
+  box-sizing: border-box;
 }
 
 /* Glass Card */
@@ -1058,26 +1077,67 @@ body {
   line-height: 1.4;
 }
 
-/* Mobile & Tablet Media Queries */
+/* Mobile & Tablet Media Queries - Guarantee Full Screen Fit on All Phones */
 @media (max-width: 900px) {
   .app-container {
-    padding: 10px;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 10px 8px 36px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
   .header-wrapper {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
-    padding: 12px;
+    gap: 10px;
+    padding: 12px 10px;
+    margin-bottom: 12px;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
   .header-actions {
     width: 100%;
+    display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
+  }
+  .header-actions .btn {
+    flex: 1 1 calc(50% - 6px);
+    justify-content: center;
+    padding: 7px 8px;
+    font-size: 0.74rem;
+    box-sizing: border-box;
   }
   .tab-switcher-wrapper {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .kpi-tabs-group {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    padding: 4px !important;
+    box-sizing: border-box !important;
+  }
+  .kpi-tab-btn {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 9px 12px !important;
+    font-size: 0.82rem !important;
+    box-sizing: border-box !important;
+  }
+  .kpi-tab-badge {
+    margin-left: auto;
+    font-size: 0.72rem;
   }
   .admin-status-bar {
     width: 100%;
@@ -1087,83 +1147,126 @@ body {
 
 @media (max-width: 768px) {
   /* Toggle from wide desktop table to high-speed mobile calling cards */
-  .desktop-table-container {
-    display: none;
+  .desktop-table-container,
+  .table-container.desktop-table-container {
+    display: none !important;
   }
   .mobile-leads-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 12px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    margin-top: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .mobile-lead-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 14px 12px !important;
+    margin: 0 !important;
+    border-radius: var(--radius-md) !important;
   }
 
   /* Compact 2-column KPI stats grid on phone */
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 12px !important;
+    box-sizing: border-box !important;
   }
   .stat-card {
-    padding: 12px 14px;
+    padding: 10px 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   .stat-val {
-    font-size: 1.45rem;
+    font-size: 1.35rem !important;
   }
   .stat-title {
-    font-size: 0.76rem;
+    font-size: 0.74rem !important;
   }
 
-  /* Phone-friendly filter bar */
-  .filter-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    padding: 12px;
+  /* Control bar and Search for RenewalView */
+  .control-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 12px !important;
+    box-sizing: border-box !important;
   }
-  .search-box-wrap {
-    width: 100%;
+  .search-box {
+    min-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .search-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 0.82rem !important;
+    padding: 8px 10px 8px 34px !important;
   }
   .filter-pills {
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 6px;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 6px !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
   }
   .filter-pill {
-    flex-shrink: 0;
-    white-space: nowrap;
-    padding: 6px 12px;
-    font-size: 0.78rem;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    padding: 5px 10px !important;
+    font-size: 0.75rem !important;
   }
   .range-panel {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
   }
 
   /* Full responsive modal */
   .modal-card {
-    width: 95vw !important;
-    max-width: 95vw !important;
+    width: 96vw !important;
+    max-width: 96vw !important;
     max-height: 94vh !important;
-    padding: 16px !important;
-    margin: 10px auto !important;
+    padding: 14px !important;
+    margin: 8px auto !important;
+    box-sizing: border-box !important;
   }
 }
 
 @media (max-width: 480px) {
+  .app-container {
+    padding: 8px 6px 36px !important;
+  }
   .brand-titles h1 {
-    font-size: 1.05rem;
+    font-size: 1.05rem !important;
   }
   .brand-titles p {
-    font-size: 0.7rem;
-    flex-wrap: wrap;
+    font-size: 0.68rem !important;
+    flex-wrap: wrap !important;
   }
   .mobile-card-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
   .stats-grid {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+  }
+  .mobile-card-meta {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 6px !important;
   }
 }
