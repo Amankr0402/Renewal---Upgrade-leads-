@@ -233,7 +233,7 @@ export default function RenewalView({
               <th>Location & Coupon</th>
               <th>TeleCRM Assignee</th>
               <th>Manual Notes</th>
-              <th>Called Status</th>
+              <th>Calling &amp; Phone Dialer</th>
               <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>
@@ -459,54 +459,92 @@ export default function RenewalView({
                       </div>
                     </td>
 
-                    {/* Called Status Column */}
+                    {/* Calling & Phone Dialer Column */}
                     <td>
-                      {user.calledStatus && user.calledStatus.isCalled ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                          <button
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {/* Direct One-Click Phone Dialer */}
+                        {user.phone ? (
+                          <a
+                            href={`tel:${user.phone.replace(/[^0-9+]/g, '')}`}
                             className="btn btn-sm"
+                            onClick={() => {
+                              if (!user.calledStatus || !user.calledStatus.isCalled) {
+                                onToggleCall && onToggleCall(user);
+                              }
+                            }}
                             style={{
-                              background: 'rgba(16, 185, 129, 0.15)',
-                              color: '#34d399',
-                              border: '1px solid rgba(16, 185, 129, 0.4)',
+                              padding: '5px 10px',
+                              fontSize: '0.78rem',
+                              fontWeight: 800,
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              textDecoration: 'none',
+                              borderRadius: '6px',
+                              background: 'linear-gradient(135deg, #10b981, #059669)',
+                              color: '#ffffff',
+                              boxShadow: '0 2px 8px rgba(16, 185, 129, 0.25)',
+                              width: 'fit-content'
+                            }}
+                            title={`Click to open phone dialer for ${user.phone} and mark as called`}
+                          >
+                            <PhoneCall size={12} />
+                            <span>Dial {user.phone}</span>
+                          </a>
+                        ) : (
+                          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>No Phone</span>
+                        )}
+
+                        {/* Called Status Toggle & Salesperson Attribution */}
+                        {user.calledStatus && user.calledStatus.isCalled ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <button
+                              className="btn btn-sm"
+                              style={{
+                                background: 'rgba(16, 185, 129, 0.15)',
+                                color: '#34d399',
+                                border: '1px solid rgba(16, 185, 129, 0.4)',
+                                padding: '1px 7px',
+                                fontSize: '0.7rem',
+                                fontWeight: 700,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                width: 'fit-content',
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => onToggleCall && onToggleCall(user)}
+                              title={`Marked called by ${user.calledStatus.calledBy}. Click to toggle or clear.`}
+                            >
+                              <Check size={11} />
+                              <span>Called ✓</span>
+                            </button>
+                            <div style={{ fontSize: '0.72rem', color: 'var(--text-primary)', fontWeight: 700 }}>
+                              By: {user.calledStatus.calledBy || 'Sales Agent'}
+                            </div>
+                            <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>
+                              {user.calledStatus.calledAt}
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            className="btn btn-sm btn-outline"
+                            style={{
                               padding: '2px 8px',
-                              fontSize: '0.74rem',
-                              fontWeight: 700,
+                              fontSize: '0.72rem',
                               display: 'inline-flex',
                               alignItems: 'center',
                               gap: '5px',
                               width: 'fit-content'
                             }}
                             onClick={() => onToggleCall && onToggleCall(user)}
-                            title={`Marked as called by ${user.calledStatus.calledBy}. Click to update or toggle.`}
+                            title={`Click to mark as called by ${currentUser?.name || 'Aman Soni'}`}
                           >
-                            <Check size={12} />
-                            <span>Called ✓</span>
+                            <UserCheck size={11} style={{ color: '#818cf8' }} />
+                            <span>Mark Called</span>
                           </button>
-                          <div style={{ fontSize: '0.72rem', color: 'var(--text-primary)', fontWeight: 700 }}>
-                            By: {user.calledStatus.calledBy || 'Sales Agent'}
-                          </div>
-                          <div style={{ fontSize: '0.66rem', color: 'var(--text-muted)' }}>
-                            {user.calledStatus.calledAt}
-                          </div>
-                        </div>
-                      ) : (
-                        <button
-                          className="btn btn-sm btn-outline"
-                          style={{
-                            padding: '3px 8px',
-                            fontSize: '0.74rem',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '5px'
-                          }}
-                          onClick={() => onToggleCall && onToggleCall(user)}
-                          title={`Click to mark as called by ${currentUser?.name || 'Aman Soni'}`}
-                        >
-                          <PhoneCall size={12} style={{ color: '#818cf8' }} />
-                          <span>Mark Called</span>
-                        </button>
-                      )}
+                        )}
+                      </div>
                     </td>
 
                     {/* Action Buttons */}
@@ -591,12 +629,17 @@ export default function RenewalView({
                 <div className="mobile-card-actions">
                   {user.phone ? (
                     <a 
-                      href={`tel:${user.phone}`} 
+                      href={`tel:${user.phone.replace(/[^0-9+]/g, '')}`} 
                       className="btn-mobile-call"
-                      title="Tap to dial phone directly"
+                      onClick={() => {
+                        if (!isCalled) {
+                          onToggleCall && onToggleCall(user);
+                        }
+                      }}
+                      title="Tap to open phone dialer and mark called"
                     >
                       <PhoneCall size={16} />
-                      <span>Call {user.phone}</span>
+                      <span>Dial {user.phone}</span>
                     </a>
                   ) : (
                     <button className="btn-mobile-call disabled" disabled>
