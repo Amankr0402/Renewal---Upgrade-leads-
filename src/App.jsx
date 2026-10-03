@@ -8,6 +8,7 @@ import MetabaseModal from './components/MetabaseModal';
 import GoogleSheetModal from './components/GoogleSheetModal';
 import TeamCredentialsModal from './components/TeamCredentialsModal';
 import DatabaseViewerModal from './components/DatabaseViewerModal';
+import DatabaseView from './components/DatabaseView';
 import LoginView from './components/LoginView';
 import { getCurrentUser, logoutUser } from './data/authService';
 import { 
@@ -30,7 +31,8 @@ import {
   TrendingUp, 
   CheckCircle2, 
   Download, 
-  AlertCircle 
+  AlertCircle,
+  Database
 } from 'lucide-react';
 
 export default function App() {
@@ -342,7 +344,7 @@ export default function App() {
         onOpenMetabase={() => setShowMetabaseModal(true)}
         onOpenGoogleSheet={() => setShowGoogleSheetModal(true)}
         onOpenCredentials={() => setShowCredentialsModal(true)}
-        onOpenDatabase={() => setShowDbModal(true)}
+        onOpenDatabase={() => setActiveTab('database')}
         currentUser={currentUser}
         onLogout={() => {
           logoutUser();
@@ -385,14 +387,31 @@ export default function App() {
               {upgrades.length.toLocaleString('en-IN')} Upgrades
             </span>
           </button>
+
+          {/* Tab 3: Notes Database Console (Admin) */}
+          {isAdmin && (
+            <button 
+              className={`kpi-tab-btn ${activeTab === 'database' ? 'active' : ''}`}
+              onClick={() => setActiveTab('database')}
+              id="tab-database"
+            >
+              <Database size={17} />
+              <span>Notes Database</span>
+              <span className="kpi-tab-badge" style={{ background: activeTab === 'database' ? '#6366f1' : undefined }}>
+                DB Console
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Status indicator on top right - ONLY FOR ADMIN */}
         {isAdmin && (
           <div className="admin-status-bar" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Active View: <strong style={{ color: activeTab === 'renewal' ? '#6366f1' : '#10b981' }}>
-                {activeTab === 'renewal' ? 'Live Renewal Recovery Pipeline' : 'Metabase Upgrade Intelligence'}
+              Active View: <strong style={{ color: activeTab === 'renewal' ? '#6366f1' : (activeTab === 'upgrade' ? '#10b981' : '#38bdf8') }}>
+                {activeTab === 'renewal' 
+                  ? 'Live Renewal Recovery Pipeline' 
+                  : (activeTab === 'upgrade' ? 'Metabase Upgrade Intelligence' : 'Notes & Call Logs Database Explorer')}
               </strong>
             </span>
             <button 
@@ -406,20 +425,22 @@ export default function App() {
         )}
       </div>
 
-      {/* Top Metric KPI Cards */}
-      <MetricCards 
-        activeTab={activeTab}
-        renewals={renewals}
-        upgrades={upgrades}
-        onFilterChange={(filter) => {
-          if (activeTab === 'renewal') {
-            setRenewalFilter(filter);
-          }
-        }}
-      />
+      {/* Top Metric KPI Cards - Show for renewal and upgrade */}
+      {activeTab !== 'database' && (
+        <MetricCards 
+          activeTab={activeTab}
+          renewals={renewals}
+          upgrades={upgrades}
+          onFilterChange={(filter) => {
+            if (activeTab === 'renewal') {
+              setRenewalFilter(filter);
+            }
+          }}
+        />
+      )}
 
       {/* Section Content based on Active Tab */}
-      {activeTab === 'renewal' ? (
+      {activeTab === 'renewal' && (
         <RenewalView 
           renewals={renewals}
           selectedFilter={renewalFilter}
@@ -436,7 +457,9 @@ export default function App() {
           currentUser={currentUser}
           onToggleCall={handleToggleCall}
         />
-      ) : (
+      )}
+
+      {activeTab === 'upgrade' && (
         <UpgradeView 
           upgrades={upgrades}
           onSelectUpgrade={(item) => {
@@ -448,6 +471,17 @@ export default function App() {
             setModalType('upgrade');
           }}
           onAdminJump={handleAdminJump}
+        />
+      )}
+
+      {activeTab === 'database' && (
+        <DatabaseView 
+          currentUser={currentUser}
+          renewals={renewals}
+          onSelectUser={(user) => {
+            setSelectedUser(user);
+            setModalType('renewal');
+          }}
         />
       )}
 

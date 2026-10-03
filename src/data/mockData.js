@@ -38,6 +38,15 @@ export function getStoredRenewals() {
   }
 }
 
+export function getStoredNotesMap() {
+  try {
+    const rawNotes = localStorage.getItem(STORAGE_KEYS.RENEWALS_NOTES);
+    return rawNotes ? JSON.parse(rawNotes) : {};
+  } catch (e) {
+    return {};
+  }
+}
+
 export function saveStoredRenewals(data) {
   try {
     const notesMap = {};
