@@ -12,6 +12,14 @@ const DEFAULT_CREDENTIALS = [
     password: "aman@1234",
     role: "Super Admin",
     team: "Management"
+  },
+  {
+    id: "usr-vikash",
+    name: "Vikash",
+    email: "vikash@theelefant.ai",
+    password: "Vikash@1234",
+    role: "Caller",
+    team: "Sales"
   }
 ];
 
@@ -26,10 +34,27 @@ export function getStoredCredentials() {
       localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(DEFAULT_CREDENTIALS));
       return DEFAULT_CREDENTIALS;
     }
-    const parsed = JSON.parse(raw);
+    let parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0 || parsed.some(c => c.email === 'admin@theelefant.ai')) {
       localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(DEFAULT_CREDENTIALS));
       return DEFAULT_CREDENTIALS;
+    }
+
+    // Ensure all default users exist and passwords match
+    let changed = false;
+    for (const def of DEFAULT_CREDENTIALS) {
+      const idx = parsed.findIndex(c => c.email.toLowerCase() === def.email.toLowerCase());
+      if (idx === -1) {
+        parsed.push(def);
+        changed = true;
+      } else if (parsed[idx].password !== def.password || parsed[idx].role !== def.role || parsed[idx].name !== def.name) {
+        parsed[idx] = { ...parsed[idx], password: def.password, role: def.role, name: def.name };
+        changed = true;
+      }
+    }
+
+    if (changed) {
+      localStorage.setItem(CREDENTIALS_KEY, JSON.stringify(parsed));
     }
     return parsed;
   } catch (e) {
